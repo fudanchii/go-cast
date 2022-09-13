@@ -4,12 +4,16 @@ type FromType[F any, T any] interface {
 	From(source F) T
 }
 
-type C[F any, T FromType[F, T]] struct {
+type IntoType[T any] interface {
+	Into() T
+}
+
+type FI[F any, T FromType[F, T]] struct {
 	Source F
 	ft     T
 }
 
-func (c C[F, T]) Into() T {
+func (c FI[F, T]) Into() T {
 	return c.ft.From(c.Source)
 }
 
@@ -22,12 +26,16 @@ type TryFromType[F, T any] interface {
 	TryFrom(source F) (T, error)
 }
 
-type CT[F any, T TryFromType[F, T]] struct {
+type TryIntoType[T any] interface {
+	TryInto() (T, error)
+}
+
+type TFI[F any, T TryFromType[F, T]] struct {
 	Source F
 	tft    T
 }
 
-func (ct CT[F, T]) TryInto() (T, error) {
+func (ct TFI[F, T]) TryInto() (T, error) {
 	return ct.tft.TryFrom(ct.Source)
 }
 

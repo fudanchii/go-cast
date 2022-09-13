@@ -2,7 +2,6 @@ package cast
 
 import (
 	"encoding/json"
-	"fmt"
 	"strconv"
 	"testing"
 )
@@ -13,38 +12,59 @@ func (s Str) From(a int) Str {
 	return Str(strconv.Itoa(a))
 }
 
-func TestCastIntoStrInt(t *testing.T) {
+func TestCastMethodIntoStrInt(t *testing.T) {
 	num := 42
 
-	str := Into[Str](num)
+	str := C[int, Str]{Source: num}.Into()
 
 	if string(str) != "42" {
 		t.Errorf("should equal 42, got %s", str)
 	}
 }
 
+func TestCastGlobalIntoStrInt(t *testing.T) {
+	num := 121
+
+	str := Into[Str](num)
+
+	if string(str) != "121" {
+		t.Errorf("should equal 42, got %s", str)
+	}
+}
+
 type JSON []byte
 
-func (j JSON) From(m map[string]string) JSON {
+func (j JSON) TryFrom(m map[string]string) (JSON, error) {
 	var (
 		result []byte
 		err    error
 	)
 	result, err = json.Marshal(m)
 	if err != nil {
-		fmt.Printf("error %s\n", err.Error())
-		result = []byte("")
+		return nil, err
 	}
-	return JSON(result)
+	return JSON(result), nil
 }
 
-func TestCastMarshalJson(t *testing.T) {
+func TestCastMethodTryIntoMarshalJson(t *testing.T) {
 	m := make(map[string]string)
 	m["hello"] = "yay"
 
-	result := Into[JSON](m)
+	mp := CT[map[string]string, JSON]{Source: m}
+	result, err := mp.TryInto()
 
-	if string(result) != `{"hello":"yay"}` {
+	if err != nil || string(result) != `{"hello":"yay"}` {
+		t.Errorf("should result in correct json, got %s", result)
+	}
+}
+
+func TestCastGlobalTryIntoMarshalJson(t *testing.T) {
+	m := make(map[string]string)
+	m["hello"] = "world"
+
+	result, err := TryInto[JSON](m)
+
+	if err != nil || string(result) != `{"hello":"world"}` {
 		t.Errorf("should result in correct json, got %s", result)
 	}
 }

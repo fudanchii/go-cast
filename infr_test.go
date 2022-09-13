@@ -1,4 +1,4 @@
-package cast
+package infr
 
 import (
 	"encoding/json"

@@ -1,4 +1,4 @@
-package cast
+package infr
 
 type FromType[F any, T any] interface {
 	From(source F) T

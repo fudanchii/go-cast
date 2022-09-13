@@ -1,3 +1,3 @@
-module github.com/fudanchii/go-cast
+module github.com/fudanchii/infr
 
 go 1.19

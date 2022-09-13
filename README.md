@@ -1,7 +1,7 @@
 infr
 ---
 
-`Into` / `From` interface similar to `Into` / `From` trait implementation in Rust.
+`Into` / `From` interface similar to [`Into`](https://doc.rust-lang.org/std/convert/trait.Into.html) / [`From`](https://doc.rust-lang.org/std/convert/trait.From.html) trait implementation in Rust.
 
 ```go
 import (

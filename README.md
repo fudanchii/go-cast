@@ -35,12 +35,12 @@ func StrPrinter(s infr.IntoType[Str]) string {
 func main() {
     num := 42
     strnum := infr.Into[Str](num)
-    fmt.Println("the answer to life, universe, and everything: %s", strnum)
+    fmt.Printf("the answer to life, universe, and everything: %s\n", strnum)
     
     fmt.Println("alternatively")
     
-    strnum1 := StrPrinter(infr.FI[Str]{num})
-    fmt.Println("the answer to life, universe, and everything: %s", strnum1)
+    strnum1 := StrPrinter(infr.FI[int, Str]{Source: num})
+    fmt.Printf("the answer to life, universe, and everything: %s\n", strnum1)
 }
 ```
 

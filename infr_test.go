@@ -15,7 +15,7 @@ func (s Str) From(a int) Str {
 func TestCastMethodIntoStrInt(t *testing.T) {
 	num := 42
 
-	str := FI[int, Str]{Source: num}.Into()
+	str := From[int, Str](num).Into()
 
 	if string(str) != "42" {
 		t.Errorf("should equal 42, got %s", str)
@@ -50,8 +50,7 @@ func TestCastMethodTryIntoMarshalJson(t *testing.T) {
 	m := make(map[string]string)
 	m["hello"] = "yay"
 
-	mp := TFI[map[string]string, JSON]{Source: m}
-	result, err := mp.TryInto()
+	result, err := TryFrom[map[string]string, JSON](m).TryInto()
 
 	if err != nil || string(result) != `{"hello":"yay"}` {
 		t.Errorf("should result in correct json, got %s", result)

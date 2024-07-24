@@ -72,3 +72,14 @@ func TryInto[T TryFromType[F, T], F any](s F) (T, error) {
 func TryFrom[F any, T TryFromType[F, T]](s F) TFI[F, T] {
 	return TFI[F, T]{Source: s}
 }
+
+func IntoSliceOf[T FromType[F, T], F any](s []F) []T {
+	var sliceT []T
+
+	for _, elt := range s {
+		newT := Into[T](elt)
+		sliceT = append(sliceT, newT)
+	}
+
+	return sliceT
+}

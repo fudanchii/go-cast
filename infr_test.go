@@ -51,9 +51,11 @@ func TestCastSlices(t *testing.T) {
 	}
 }
 
-type JSON []byte
+type RawJSON []byte
 
-func (j JSON) TryFrom(m map[string]string) (JSON, error) {
+type JSONStruct map[string]any
+
+func (j RawJSON) TryFrom(m JSONStruct) (RawJSON, error) {
 	var (
 		result []byte
 		err    error
@@ -62,14 +64,24 @@ func (j JSON) TryFrom(m map[string]string) (JSON, error) {
 	if err != nil {
 		return nil, err
 	}
-	return JSON(result), nil
+	return RawJSON(result), nil
+}
+
+func (j JSONStruct) TryFrom(s RawJSON) (JSONStruct, error) {
+	if j == nil {
+		j = make(JSONStruct)
+	}
+
+	err := json.Unmarshal(s, &j)
+
+	return j, err
 }
 
 func TestCastMethodTryIntoMarshalJson(t *testing.T) {
-	m := make(map[string]string)
+	m := make(JSONStruct)
 	m["hello"] = "yay"
 
-	result, err := TryFrom[map[string]string, JSON](m).TryInto()
+	result, err := TryFrom[JSONStruct, RawJSON](m).TryInto()
 
 	if err != nil || string(result) != `{"hello":"yay"}` {
 		t.Errorf("should result in correct json, got %s", result)
@@ -77,12 +89,75 @@ func TestCastMethodTryIntoMarshalJson(t *testing.T) {
 }
 
 func TestCastGlobalTryIntoMarshalJson(t *testing.T) {
-	m := make(map[string]string)
+	m := make(JSONStruct)
 	m["hello"] = "world"
 
-	result, err := TryInto[JSON](m)
+	result, err := TryInto[RawJSON](m)
 
 	if err != nil || string(result) != `{"hello":"world"}` {
 		t.Errorf("should result in correct json, got %s", result)
+	}
+}
+
+func TestCastGlobalTryIntoSliceOfMarshalJson(t *testing.T) {
+	cases := []JSONStruct{
+		{
+			"ping": "pong",
+		},
+		{
+			"hello": "world",
+		},
+	}
+
+	results := []RawJSON{
+		[]byte(`{"ping":"pong"}`),
+		[]byte(`{"hello":"world"}`),
+	}
+
+	actuals, err := TryIntoSliceOf[RawJSON](cases)
+
+	if err != nil {
+		t.Errorf("should return no error, got error : %s", err)
+	}
+
+	if string(actuals[0]) != string(results[0]) {
+		t.Errorf("should returns correct json.")
+	}
+
+	if string(actuals[1]) != string(results[1]) {
+		t.Errorf("should returns correct json.")
+	}
+
+	{
+		cases := []struct {
+			Raw   []RawJSON
+			Error bool
+		}{
+			{
+				Raw: []RawJSON{[]byte(`{"ping":"pong"}`)},
+			},
+			{
+				Raw:   []RawJSON{[]byte(`{`)},
+				Error: true,
+			},
+		}
+
+		for _, c := range cases {
+			actuals, err := TryIntoSliceOf[JSONStruct](c.Raw)
+
+			if c.Error && err == nil {
+				t.Errorf("should results in error.")
+				continue
+			}
+
+			if (!c.Error) && err != nil {
+				t.Errorf("should not results in error.")
+				continue
+			}
+
+			if !c.Error && actuals == nil {
+				t.Errorf("should not results in nil.")
+			}
+		}
 	}
 }

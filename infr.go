@@ -73,6 +73,8 @@ func TryFrom[F any, T TryFromType[F, T]](s F) TFI[F, T] {
 	return TFI[F, T]{Source: s}
 }
 
+// IntoSliceOf infallibly converts a slice of array with element type `F`
+// into a slice of array with element type of `T`.
 func IntoSliceOf[T FromType[F, T], F any](s []F) []T {
 	var sliceT []T
 
@@ -82,4 +84,22 @@ func IntoSliceOf[T FromType[F, T], F any](s []F) []T {
 	}
 
 	return sliceT
+}
+
+// TryIntoSliceOf converts a slice of array with element type `F`
+// into a slice of array with element type of `T`, additionally returns
+// error when it happens.
+func TryIntoSliceOf[T TryFromType[F, T], F any](s []F) ([]T, error) {
+	var sliceT []T
+
+	for _, elt := range s {
+		newT, err := TryInto[T](elt)
+		if err != nil {
+			return sliceT, err
+		}
+
+		sliceT = append(sliceT, newT)
+	}
+
+	return sliceT, nil
 }

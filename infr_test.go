@@ -68,10 +68,6 @@ func (j RawJSON) TryFrom(m JSONStruct) (RawJSON, error) {
 }
 
 func (j JSONStruct) TryFrom(s RawJSON) (JSONStruct, error) {
-	if j == nil {
-		j = make(JSONStruct)
-	}
-
 	err := json.Unmarshal(s, &j)
 
 	return j, err

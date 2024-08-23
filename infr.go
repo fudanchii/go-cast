@@ -103,3 +103,11 @@ func TryIntoSliceOf[T TryFromType[F, T], F any](s []F) ([]T, error) {
 
 	return sliceT, nil
 }
+
+func CopyAsRef[T any](s T) *T {
+	var copyT T
+
+	copyT = s
+
+	return &copyT
+}

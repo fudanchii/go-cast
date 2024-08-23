@@ -157,3 +157,17 @@ func TestCastGlobalTryIntoSliceOfMarshalJson(t *testing.T) {
 		}
 	}
 }
+
+func TestCopyAsRef(t *testing.T) {
+	c := 42
+	d := CopyAsRef(c)
+	e := &c
+	*e = 3
+	if c != 3 {
+		t.Errorf("should affected by change from a pointer")
+	}
+
+	if *d == 3 {
+		t.Errorf("should not affected by change to a copy")
+	}
+}

@@ -75,8 +75,9 @@ func TryFrom[F any, T TryFromType[F, T]](s F) TFI[F, T] {
 
 // IntoSliceOf infallibly converts a slice of array with element type `F`
 // into a slice of array with element type of `T`.
+// It returns an empty slice of `T` even if input is nil.
 func IntoSliceOf[T FromType[F, T], F any](s []F) []T {
-	var sliceT []T
+	var sliceT []T = make([]T, 0, len(s))
 
 	for _, elt := range s {
 		newT := Into[T](elt)
@@ -89,8 +90,9 @@ func IntoSliceOf[T FromType[F, T], F any](s []F) []T {
 // TryIntoSliceOf converts a slice of array with element type `F`
 // into a slice of array with element type of `T`, additionally returns
 // error when it happens.
+// It returns an empty slice of `T` even if input is nil.
 func TryIntoSliceOf[T TryFromType[F, T], F any](s []F) ([]T, error) {
-	var sliceT []T
+	var sliceT []T = make([]T, 0, len(s))
 
 	for _, elt := range s {
 		newT, err := TryInto[T](elt)
@@ -104,6 +106,7 @@ func TryIntoSliceOf[T TryFromType[F, T], F any](s []F) ([]T, error) {
 	return sliceT, nil
 }
 
+// CopyAsRef returns a reference to the copy of the input value.
 func CopyAsRef[T any](s T) *T {
 	return &s
 }

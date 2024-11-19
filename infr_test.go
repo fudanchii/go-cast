@@ -51,6 +51,32 @@ func TestCastSlices(t *testing.T) {
 	}
 }
 
+func TestEmptyCastSlices(t *testing.T) {
+	nums := []int{}
+	slices := IntoSliceOf[Str](nums)
+
+	if slices == nil {
+		t.Errorf("should not be nil")
+	}
+
+	if len(slices) > 0 {
+		t.Errorf("should be empty")
+	}
+}
+
+func TestNilCastSlices(t *testing.T) {
+	var nums []int
+	slices := IntoSliceOf[Str](nums)
+
+	if slices == nil {
+		t.Errorf("nil input should not result in nil slices")
+	}
+
+	if len(slices) > 0 {
+		t.Errorf("result should be empty")
+	}
+}
+
 type RawJSON []byte
 
 type JSONStruct map[string]any
@@ -155,6 +181,34 @@ func TestCastGlobalTryIntoSliceOfMarshalJson(t *testing.T) {
 				t.Errorf("should not results in nil.")
 			}
 		}
+	}
+}
+
+func TestEmptyCastGlobalTryIntoSliceOfMarshalJson(t *testing.T) {
+	cases := []JSONStruct{}
+
+	actuals, err := TryIntoSliceOf[RawJSON](cases)
+
+	if err != nil {
+		t.Errorf("should return no error, got error : %s", err)
+	}
+
+	if len(actuals) > 0 {
+		t.Errorf("should return empty slice")
+	}
+}
+
+func TestNilCastGlobalTryIntoSliceOfMarshalJson(t *testing.T) {
+	var cases []JSONStruct
+
+	actuals, err := TryIntoSliceOf[RawJSON](cases)
+
+	if err != nil {
+		t.Errorf("should return no error, got error : %s", err)
+	}
+
+	if len(actuals) > 0 {
+		t.Errorf("should return empty slice")
 	}
 }
 
